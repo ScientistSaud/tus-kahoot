@@ -14,7 +14,33 @@ export interface Database {
           id: string
           section: 'basic_sciences' | 'clinical_sciences'
           topic: string
-          subtopic: string | null
+          subtopic:
+            | 'anatomy'
+            | 'histology'
+            | 'embryology'
+            | 'physiology'
+            | 'biochemistry'
+            | 'microbiology'
+            | 'immunology'
+            | 'pathology'
+            | 'pharmacology'
+            | 'biostatistics'
+            | 'public_health'
+            | 'internal_medicine'
+            | 'surgery'
+            | 'pediatrics'
+            | 'obstetrics_gynecology'
+            | 'psychiatry'
+            | 'neurology'
+            | 'radiology'
+            | 'orthopedics'
+            | 'ophthalmology'
+            | 'ent'
+            | 'dermatology'
+            | 'cardiology'
+            | 'urology'
+            | 'other'
+            | null
           stem: string
           option_a: string
           option_b: string
@@ -28,7 +54,33 @@ export interface Database {
           id?: string
           section: 'basic_sciences' | 'clinical_sciences'
           topic: string
-          subtopic?: string | null
+          subtopic?:
+            | 'anatomy'
+            | 'histology'
+            | 'embryology'
+            | 'physiology'
+            | 'biochemistry'
+            | 'microbiology'
+            | 'immunology'
+            | 'pathology'
+            | 'pharmacology'
+            | 'biostatistics'
+            | 'public_health'
+            | 'internal_medicine'
+            | 'surgery'
+            | 'pediatrics'
+            | 'obstetrics_gynecology'
+            | 'psychiatry'
+            | 'neurology'
+            | 'radiology'
+            | 'orthopedics'
+            | 'ophthalmology'
+            | 'ent'
+            | 'dermatology'
+            | 'cardiology'
+            | 'urology'
+            | 'other'
+            | null
           stem: string
           option_a: string
           option_b: string

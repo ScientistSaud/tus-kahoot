@@ -14,8 +14,8 @@ export function Header() {
   };
 
   return (
-    <header className="flex items-center justify-between border-b border-[var(--color-surface)] bg-transparent px-6 py-4">
-      <div className="text-xl font-bold tracking-tight text-white">MedBank</div>
+    <header className="flex items-center justify-between border-b flex-shrink-0 border-[var(--color-surface)] bg-[var(--color-bg)] px-6 py-4">
+      <div className="text-xl font-bold tracking-tight text-white">TUS Question Bank</div>
       <div className="flex items-center gap-4">
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-surface)] font-bold text-white">
           U

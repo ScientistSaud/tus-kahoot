@@ -4,6 +4,40 @@ export const SECTIONS = [
   { id: 'clinical_sciences', label: 'Clinical Sciences' },
 ] as const;
 
+export const SUBTOPIC_TAGS = [
+  'anatomy',
+  'histology',
+  'embryology',
+  'physiology',
+  'biochemistry',
+  'microbiology',
+  'immunology',
+  'pathology',
+  'pharmacology',
+  'biostatistics',
+  'public_health',
+  'internal_medicine',
+  'surgery',
+  'pediatrics',
+  'obstetrics_gynecology',
+  'psychiatry',
+  'neurology',
+  'radiology',
+  'orthopedics',
+  'ophthalmology',
+  'ent',
+  'dermatology',
+  'cardiology',
+  'urology',
+  'other',
+] as const;
+
+export type SubtopicTag = (typeof SUBTOPIC_TAGS)[number];
+
+export function isSubtopicTag(value: unknown): value is SubtopicTag {
+  return typeof value === 'string' && (SUBTOPIC_TAGS as readonly string[]).includes(value);
+}
+
 export const ANSWER_COLORS = {
   A: 'bg-[var(--color-answer-a)]',
   B: 'bg-[var(--color-answer-b)]',

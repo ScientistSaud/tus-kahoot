@@ -7,7 +7,7 @@ import { useQuizStore } from '@/lib/stores/quiz-store';
 import { PillToggle } from '@/components/ui/PillToggle';
 import { ChipSelect } from '@/components/ui/ChipSelect';
 import { Header } from '@/components/Header';
-import { SECTIONS } from '@/lib/constants';
+import { SECTIONS, isSubtopicTag } from '@/lib/constants';
 import { formatTopic } from '@/lib/utils';
 
 export default function QuizSetupPage() {
@@ -37,7 +37,13 @@ export default function QuizSetupPage() {
       }
       const { data } = await query;
       if (data) {
-        const unique = Array.from(new Set(data.map((d: any) => d.topic)));
+        const unique = Array.from(
+          new Set(
+            data
+              .map((d: any) => d.topic)
+              .filter((topic): topic is string => typeof topic === 'string' && topic.length > 0)
+          )
+        );
         setAvailableTopics(unique as string[]);
         setSelectedTopics([]); // reset selection on section change
       }
@@ -60,7 +66,13 @@ export default function QuizSetupPage() {
         .not('subtopic', 'is', null);
 
       if (data) {
-        const unique = Array.from(new Set(data.map((d: any) => d.subtopic)));
+        const unique = Array.from(
+          new Set(
+            data
+              .map((d: any) => d.subtopic)
+              .filter(isSubtopicTag)
+          )
+        );
         setAvailableSubtopics(unique as string[]);
         setSelectedSubtopics([]);
       }

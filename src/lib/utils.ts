@@ -1,4 +1,6 @@
-export function formatTopic(slug: string): string {
+export function formatTopic(slug: string | null | undefined): string {
+  if (!slug) return '';
+
   return slug
     .split('_')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
