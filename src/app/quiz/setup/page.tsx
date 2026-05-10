@@ -7,7 +7,7 @@ import { useQuizStore } from '@/lib/stores/quiz-store';
 import { PillToggle } from '@/components/ui/PillToggle';
 import { ChipSelect } from '@/components/ui/ChipSelect';
 import { Header } from '@/components/Header';
-import { SECTIONS, isSubtopicTag } from '@/lib/constants';
+import { SECTIONS, isSubtopicTag, type SubtopicTag } from '@/lib/constants';
 import { formatTopic } from '@/lib/utils';
 
 export default function QuizSetupPage() {
@@ -19,8 +19,8 @@ export default function QuizSetupPage() {
   const [section, setSection] = useState<'all' | 'basic_sciences' | 'clinical_sciences'>('all');
   const [availableTopics, setAvailableTopics] = useState<string[]>([]);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-  const [availableSubtopics, setAvailableSubtopics] = useState<string[]>([]);
-  const [selectedSubtopics, setSelectedSubtopics] = useState<string[]>([]);
+  const [availableSubtopics, setAvailableSubtopics] = useState<SubtopicTag[]>([]);
+  const [selectedSubtopics, setSelectedSubtopics] = useState<SubtopicTag[]>([]);
   const [questionCount, setQuestionCount] = useState<number>(10);
   const [timerEnabled, setTimerEnabled] = useState<boolean>(true);
   const [excludeIncomplete, setExcludeIncomplete] = useState<boolean>(true);
@@ -73,7 +73,7 @@ export default function QuizSetupPage() {
               .filter(isSubtopicTag)
           )
         );
-        setAvailableSubtopics(unique as string[]);
+        setAvailableSubtopics(unique);
         setSelectedSubtopics([]);
       }
     }
