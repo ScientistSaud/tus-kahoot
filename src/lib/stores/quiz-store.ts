@@ -8,7 +8,7 @@ export interface QuizConfig {
 }
 
 export interface AnswerRecord {
-  questionId: string;
+  questionId: number;
   userAnswer: string | null;
   isCorrect: boolean;
   timeTakenMs: number;
@@ -16,14 +16,14 @@ export interface AnswerRecord {
 
 interface QuizState {
   config: QuizConfig | null;
-  questionIds: string[];
+  questionIds: number[];
   answers: AnswerRecord[];
   score: number;
   streak: number;
   maxStreak: number;
   
   setConfig: (config: QuizConfig) => void;
-  setQuestionIds: (ids: string[]) => void;
+  setQuestionIds: (ids: number[]) => void;
   addAnswer: (answer: AnswerRecord, pointsAdded: number) => void;
   resetQuizState: () => void;
 }

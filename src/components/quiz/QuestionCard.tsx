@@ -4,13 +4,13 @@ import { BookmarkIcon as BookmarkOutline } from '@heroicons/react/24/outline';
 import { createClient } from '@/lib/supabase/client';
 
 interface QuestionCardProps {
-  questionId: string;
+  questionId: number;
   questionNumber: number;
   totalQuestions: number;
-  stem: string;
+  questionText: string;
 }
 
-export function QuestionCard({ questionId, questionNumber, totalQuestions, stem }: QuestionCardProps) {
+export function QuestionCard({ questionId, questionNumber, totalQuestions, questionText }: QuestionCardProps) {
   const [bookmarked, setBookmarked] = React.useState(false);
   const supabase = React.useMemo(() => createClient(), []);
 
@@ -69,7 +69,7 @@ export function QuestionCard({ questionId, questionNumber, totalQuestions, stem 
         </button>
       </div>
       <h2 className="text-xl font-bold leading-relaxed text-black">
-        {stem}
+        {questionText}
       </h2>
     </div>
   );

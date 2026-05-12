@@ -11,9 +11,9 @@ export interface Database {
     Tables: {
       questions: {
         Row: {
-          id: string
-          section: 'basic_sciences' | 'clinical_sciences'
-          topic: string
+          question: number
+          question_text: string
+          topic: string | null
           subtopic:
             | 'anatomy'
             | 'histology'
@@ -41,19 +41,22 @@ export interface Database {
             | 'urology'
             | 'other'
             | null
-          stem: string
           option_a: string
           option_b: string
           option_c: string
           option_d: string
           option_e: string | null
           correct_answer: 'A' | 'B' | 'C' | 'D' | 'E'
-          created_at: string
+          is_incomplete: boolean | null
+          source_page_hint: string | null
+          source_file: string | null
+          source_file_id: string | null
+          join_key: string | null
         }
         Insert: {
-          id?: string
-          section: 'basic_sciences' | 'clinical_sciences'
-          topic: string
+          question: number
+          question_text: string
+          topic?: string | null
           subtopic?:
             | 'anatomy'
             | 'histology'
@@ -81,14 +84,17 @@ export interface Database {
             | 'urology'
             | 'other'
             | null
-          stem: string
           option_a: string
           option_b: string
           option_c: string
           option_d: string
           option_e?: string | null
           correct_answer: 'A' | 'B' | 'C' | 'D' | 'E'
-          created_at?: string
+          is_incomplete?: boolean | null
+          source_page_hint?: string | null
+          source_file?: string | null
+          source_file_id?: string | null
+          join_key?: string | null
         }
         Update: Partial<Database['public']['Tables']['questions']['Insert']>
         Relationships: []
@@ -130,7 +136,7 @@ export interface Database {
           id: string
           user_id: string
           session_id: string
-          question_id: string
+          question_id: number
           user_answer: string | null
           is_correct: boolean
           time_taken_ms: number | null
@@ -140,7 +146,7 @@ export interface Database {
           id?: string
           user_id: string
           session_id: string
-          question_id: string
+          question_id: number
           user_answer?: string | null
           is_correct?: boolean
           time_taken_ms?: number | null
@@ -153,7 +159,7 @@ export interface Database {
             columns: ['question_id']
             isOneToOne: false
             referencedRelation: 'questions'
-            referencedColumns: ['id']
+            referencedColumns: ['question']
           },
           {
             foreignKeyName: 'attempts_session_id_fkey'
@@ -175,13 +181,13 @@ export interface Database {
         Row: {
           id: string
           user_id: string
-          question_id: string
+          question_id: number
           created_at: string
         }
         Insert: {
           id?: string
           user_id: string
-          question_id: string
+          question_id: number
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['bookmarks']['Insert']>
@@ -191,7 +197,7 @@ export interface Database {
             columns: ['question_id']
             isOneToOne: false
             referencedRelation: 'questions'
-            referencedColumns: ['id']
+            referencedColumns: ['question']
           },
           {
             foreignKeyName: 'bookmarks_user_id_fkey'

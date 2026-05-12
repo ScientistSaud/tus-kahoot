@@ -11,14 +11,19 @@ import { TIMER_DURATION_MS } from '@/lib/constants';
 import { calculateScore } from '@/lib/utils';
 
 interface QuestionData {
-  id: string;
-  stem: string;
+  question: number;
+  question_text: string;
   option_a: string;
   option_b: string;
   option_c: string;
   option_d: string;
   option_e: string | null;
-  correct_answer: string;
+  correct_answer: 'A' | 'B' | 'C' | 'D' | 'E';
+}
+
+interface AnswerOption {
+  letter: 'A' | 'B' | 'C' | 'D' | 'E';
+  text: string;
 }
 
 export function QuizPlayer({ questions }: { questions: QuestionData[] }) {
@@ -38,7 +43,7 @@ export function QuizPlayer({ questions }: { questions: QuestionData[] }) {
   // Map options
   const options = React.useMemo(() => {
     if (!activeQuestion) return [];
-    const opts: any[] = [
+    const opts: AnswerOption[] = [
       { letter: 'A', text: activeQuestion.option_a },
       { letter: 'B', text: activeQuestion.option_b },
       { letter: 'C', text: activeQuestion.option_c },
@@ -75,7 +80,7 @@ export function QuizPlayer({ questions }: { questions: QuestionData[] }) {
       }
 
       store.addAnswer({
-        questionId: activeQuestion.id,
+        questionId: activeQuestion.question,
         userAnswer: letter,
         isCorrect,
         timeTakenMs: TIMER_DURATION_MS - timeRemainingMs,
@@ -89,8 +94,8 @@ export function QuizPlayer({ questions }: { questions: QuestionData[] }) {
     if (status !== 'default' || !store.config?.timerEnabled) return;
     
     if (timeRemainingMs <= 0) {
-      handleAnswer(null, true);
-      return;
+      const timeout = window.setTimeout(() => handleAnswer(null, true), 0);
+      return () => window.clearTimeout(timeout);
     }
 
     const interval = setInterval(() => {
@@ -166,10 +171,10 @@ export function QuizPlayer({ questions }: { questions: QuestionData[] }) {
 
       <main className="flex flex-1 flex-col justify-center px-4 py-8">
         <QuestionCard 
-          questionId={activeQuestion.id}
+          questionId={activeQuestion.question}
           questionNumber={currentIndex + 1}
           totalQuestions={questions.length}
-          stem={activeQuestion.stem}
+          questionText={activeQuestion.question_text}
         />
         
         <div className="mx-auto mt-12 w-full max-w-4xl px-4">

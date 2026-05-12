@@ -7,7 +7,7 @@ import { useQuizStore } from '@/lib/stores/quiz-store';
 import { PillToggle } from '@/components/ui/PillToggle';
 import { ChipSelect } from '@/components/ui/ChipSelect';
 import { Header } from '@/components/Header';
-import { SECTIONS, isSubtopicTag, type SubtopicTag } from '@/lib/constants';
+import { isSubtopicTag, type SubtopicTag } from '@/lib/constants';
 import { formatTopic } from '@/lib/utils';
 import type { Database } from '@/lib/types/database';
 
@@ -19,25 +19,26 @@ export default function QuizSetupPage() {
   const setConfig = useQuizStore((state) => state.setConfig);
   const setQuestionIds = useQuizStore((state) => state.setQuestionIds);
 
-  const [section, setSection] = useState<'all' | 'basic_sciences' | 'clinical_sciences'>('all');
   const [availableTopics, setAvailableTopics] = useState<string[]>([]);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [availableSubtopics, setAvailableSubtopics] = useState<SubtopicTag[]>([]);
   const [selectedSubtopics, setSelectedSubtopics] = useState<SubtopicTag[]>([]);
   const [questionCount, setQuestionCount] = useState<number>(10);
   const [timerEnabled, setTimerEnabled] = useState<boolean>(true);
+  const [excludeIncomplete, setExcludeIncomplete] = useState<boolean>(true);
   
   const [matchingCount, setMatchingCount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Fetch topics dynamically
   useEffect(() => {
     async function fetchTopics() {
-      let query = supabase.from('questions').select('topic');
-      if (section !== 'all') {
-        query = query.eq('section', section);
+      const { data, error } = await supabase.from('questions').select('topic');
+      if (error) {
+        setErrorMessage(`Could not load topics: ${error.message}`);
+        return;
       }
-      const { data } = await query;
       if (data) {
         const unique = Array.from(
           new Set(
@@ -45,13 +46,12 @@ export default function QuizSetupPage() {
               .map((d: Pick<QuestionRow, 'topic'>) => d.topic)
               .filter((topic): topic is string => typeof topic === 'string' && topic.length > 0)
           )
-        );
+        ).sort();
         setAvailableTopics(unique);
-        setSelectedTopics([]); // reset selection on section change
       }
     }
     fetchTopics();
-  }, [section, supabase]);
+  }, [supabase]);
 
   // Fetch subtopics dynamically based on topics
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function QuizSetupPage() {
               .map((d: Pick<QuestionRow, 'subtopic'>) => d.subtopic)
               .filter(isSubtopicTag)
           )
-        );
+        ).sort();
         setAvailableSubtopics(unique);
         setSelectedSubtopics([]);
       }
@@ -85,26 +85,30 @@ export default function QuizSetupPage() {
   // Live matching count (debounced slightly by effect)
   useEffect(() => {
     async function fetchCount() {
-      let query = supabase.from('questions').select('*', { count: 'exact', head: true });
-      if (section !== 'all') query = query.eq('section', section);
+      let query = supabase.from('questions').select('question', { count: 'exact', head: true });
+      if (excludeIncomplete) query = query.eq('is_incomplete', false);
       if (selectedTopics.length > 0) query = query.in('topic', selectedTopics);
       if (selectedSubtopics.length > 0) query = query.in('subtopic', selectedSubtopics);
-      // In a real app we might join to attempts to check "exclude incomplete" 
-      // but without complex RPC, we can just do a basic count for UX
-      const { count } = await query;
+      const { count, error } = await query;
+      if (error) {
+        setErrorMessage(`Could not count matching questions: ${error.message}`);
+        setMatchingCount(0);
+        return;
+      }
       setMatchingCount(count || 0);
     }
     fetchCount();
-  }, [section, selectedTopics, selectedSubtopics, supabase]);
+  }, [excludeIncomplete, selectedTopics, selectedSubtopics, supabase]);
 
   const handleStart = async () => {
     if (matchingCount === 0) return;
+    setErrorMessage(null);
     setLoading(true);
 
-    const { data: userData } = await supabase.auth.getUser();
-    if (!userData?.user) {
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError || !userData?.user) {
+      setErrorMessage(userError?.message || 'You must be logged in to start a quiz.');
       setLoading(false);
-      router.push('/login');
       return;
     }
 
@@ -114,7 +118,7 @@ export default function QuizSetupPage() {
       .insert({
         user_id: userData.user.id,
         timer_enabled: timerEnabled,
-        section_filter: section === 'all' ? null : section,
+        section_filter: null,
       })
       .select('id')
       .single();
@@ -128,25 +132,32 @@ export default function QuizSetupPage() {
     const sessionId = sessionData.id;
 
     // 2. Fetch randomized questions
-    let query = supabase.from('questions').select('id');
-    if (section !== 'all') query = query.eq('section', section);
+    let query = supabase.from('questions').select('question');
+    if (excludeIncomplete) query = query.eq('is_incomplete', false);
     if (selectedTopics.length > 0) query = query.in('topic', selectedTopics);
     if (selectedSubtopics.length > 0) query = query.in('subtopic', selectedSubtopics);
 
-    const { data: qs } = await query;
+    const { data: qs, error: questionsError } = await query;
+    if (questionsError) {
+      setErrorMessage(`Could not load questions: ${questionsError.message}`);
+      setLoading(false);
+      return;
+    }
+
     if (qs && qs.length > 0) {
       // Shuffle & limit
       const shuffled = [...qs].sort(() => 0.5 - Math.random());
       const selectedQs = questionCount === -1 ? shuffled : shuffled.slice(0, questionCount);
-      const qIds = selectedQs.map((q) => q.id);
+      const qIds = selectedQs.map((q) => q.question);
 
       // 3. Set Store
-      setConfig({ sessionId, timerEnabled, sectionFilter: section === 'all' ? null : section });
+      setConfig({ sessionId, timerEnabled, sectionFilter: null });
       setQuestionIds(qIds);
 
       // 4. Navigate
       router.push(`/quiz/${sessionId}`);
     } else {
+      setErrorMessage('No questions matched the selected filters.');
       setLoading(false);
     }
   };
@@ -161,16 +172,6 @@ export default function QuizSetupPage() {
         </div>
 
         <div className="space-y-6 rounded-[var(--radius-card)] bg-[var(--color-card)] p-6">
-          {/* Section Filter */}
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-white">Section</label>
-            <PillToggle
-              options={SECTIONS}
-              selected={section}
-              onChange={(v) => setSection(v as typeof section)}
-            />
-          </div>
-
           {/* Topic Filter */}
           <div className="space-y-2">
             <label className="text-sm font-semibold text-white">Topics</label>
@@ -234,8 +235,25 @@ export default function QuizSetupPage() {
                 onChange={(v) => setTimerEnabled(v as boolean)}
               />
             </div>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-white">Question Quality</label>
+              <PillToggle
+                options={[
+                  { id: true, label: 'Complete Only' },
+                  { id: false, label: 'Include Incomplete' },
+                ]}
+                selected={excludeIncomplete}
+                onChange={(v) => setExcludeIncomplete(v as boolean)}
+              />
+            </div>
           </div>
         </div>
+
+        {errorMessage && (
+          <div className="rounded-[var(--radius-card)] border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-200">
+            {errorMessage}
+          </div>
+        )}
 
         <div className="flex items-center justify-between rounded-[var(--radius-card)] bg-[var(--color-surface)] p-6">
           <div className="text-lg">

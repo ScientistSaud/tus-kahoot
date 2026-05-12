@@ -4,6 +4,11 @@ import { StatsStrip } from '@/components/StatsStrip';
 import { TopicGrid } from '@/components/TopicGrid';
 import Link from 'next/link';
 
+type AttemptWithQuestion = {
+  is_correct: boolean;
+  questions: { topic: string | null } | null;
+};
+
 export default async function DashboardPage() {
   const supabase = await createClient();
 
@@ -23,13 +28,13 @@ export default async function DashboardPage() {
   const quizzesTaken = sessions?.length || 0;
 
   // Fetch attempts joined with questions for topic logic
-  // @ts-ignore
-  const { data: attempts } = await supabase
+  const { data } = await supabase
     .from('attempts')
     .select(`
       is_correct,
       questions!inner(topic)
     `);
+  const attempts = data as unknown as AttemptWithQuestion[] | null;
 
   let overallAccuracy = 0;
   const topicMap: Record<string, { total: number; correct: number }> = {};
@@ -38,8 +43,8 @@ export default async function DashboardPage() {
     const totalCorrect = attempts.filter((a) => a.is_correct).length;
     overallAccuracy = (totalCorrect / attempts.length) * 100;
 
-    attempts.forEach((a: any) => {
-      const topic = a.questions.topic;
+    attempts.forEach((a) => {
+      const topic = a.questions?.topic || 'untagged';
       if (!topicMap[topic]) topicMap[topic] = { total: 0, correct: 0 };
       topicMap[topic].total += 1;
       if (a.is_correct) topicMap[topic].correct += 1;

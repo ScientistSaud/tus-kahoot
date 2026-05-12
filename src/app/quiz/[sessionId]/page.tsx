@@ -28,7 +28,7 @@ export default function QuizPage({ params }: { params: Promise<{ sessionId: stri
       const { data, error } = await supabase
         .from('questions')
         .select('*')
-        .in('id', store.questionIds);
+        .in('question', store.questionIds);
 
       if (error || !data) {
         console.error(error);
@@ -38,7 +38,7 @@ export default function QuizPage({ params }: { params: Promise<{ sessionId: stri
 
       // Preserve the sorted order from setup
       const ordered = store.questionIds
-        .map((id) => data.find((q) => q.id === id))
+        .map((id) => data.find((q) => q.question === id))
         .filter((question): question is QuestionRow => Boolean(question));
       setQuestions(ordered);
       setLoading(false);
