@@ -119,6 +119,11 @@ export function QuizPlayer({ questions }: { questions: QuestionData[] }) {
     }
   }, [currentIndex, questions.length, router, store.config?.sessionId]);
 
+  const leaveExam = useCallback(() => {
+    store.resetQuizState();
+    router.push('/dashboard');
+  }, [router, store]);
+
   // Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -162,6 +167,16 @@ export function QuizPlayer({ questions }: { questions: QuestionData[] }) {
         timerEnabled={store.config?.timerEnabled || false}
         timeRemainingMs={Math.max(0, timeRemainingMs)}
       />
+
+      <div className="flex justify-center bg-[var(--color-bg)] px-4 py-4">
+        <button
+          type="button"
+          onClick={leaveExam}
+          className="rounded-[var(--radius-button)] border border-red-500/50 bg-red-500/10 px-5 py-2 text-sm font-bold text-red-200 transition-colors hover:border-red-400 hover:bg-red-500/20 hover:text-white"
+        >
+          Leave Exam
+        </button>
+      </div>
       
       <FeedbackBanner 
         status={feedbackStatus} 

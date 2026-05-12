@@ -46,6 +46,12 @@ export default async function BookmarksPage() {
       <main className="mx-auto max-w-7xl space-y-8 p-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold text-white">Your Bookmarks</h1>
+          <Link
+            href="/dashboard"
+            className="rounded-[var(--radius-button)] bg-white px-5 py-2 text-sm font-bold text-black transition-colors hover:bg-white/85"
+          >
+            Return
+          </Link>
         </div>
 
         {bookmarks && bookmarks.length > 0 ? (

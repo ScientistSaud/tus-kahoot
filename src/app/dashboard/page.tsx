@@ -67,7 +67,13 @@ export default async function DashboardPage() {
           accuracy={overallAccuracy}
         />
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <Link
+            href="/"
+            className="rounded-[var(--radius-button)] bg-white px-6 py-3 font-semibold text-black transition-colors hover:bg-white/85"
+          >
+            Home
+          </Link>
           <Link
             href="/quiz/setup"
             className="rounded-[var(--radius-button)] bg-blue-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-blue-700"

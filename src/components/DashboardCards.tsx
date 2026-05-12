@@ -6,6 +6,7 @@ import {
   PlayIcon,
   PlusIcon
 } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 
 const mainCards = [
   {
@@ -39,7 +40,7 @@ export function DashboardCards() {
     <div className="space-y-8">
       {/* Action Strip */}
       <div className="flex flex-col sm:flex-row gap-4">
-        <button className="flex-1 group relative overflow-hidden rounded-[var(--radius-card)] bg-[var(--color-surface)] border border-[var(--color-surface)] p-6 transition-all hover:border-[var(--color-muted)]">
+        <Link href="/quiz/setup" className="flex-1 group relative overflow-hidden rounded-[var(--radius-card)] bg-[var(--color-surface)] border border-[var(--color-surface)] p-6 transition-all hover:border-[var(--color-muted)]">
           <div className="relative z-10 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-answer-a)]/10 text-[var(--color-answer-a)]">
@@ -52,9 +53,9 @@ export function DashboardCards() {
             </div>
             <ArrowRightIcon className="h-5 w-5 text-[var(--color-muted)] group-hover:text-white transition-colors" />
           </div>
-        </button>
+        </Link>
 
-        <button className="flex-1 group relative overflow-hidden rounded-[var(--radius-card)] bg-[var(--color-surface)] border border-[var(--color-surface)] p-6 transition-all hover:border-[var(--color-muted)]">
+        <Link href="/quiz/setup" className="flex-1 group relative overflow-hidden rounded-[var(--radius-card)] bg-[var(--color-surface)] border border-[var(--color-surface)] p-6 transition-all hover:border-[var(--color-muted)]">
           <div className="relative z-10 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-answer-b)]/10 text-[var(--color-answer-b)]">
@@ -67,7 +68,7 @@ export function DashboardCards() {
             </div>
             <ArrowRightIcon className="h-5 w-5 text-[var(--color-muted)] group-hover:text-white transition-colors" />
           </div>
-        </button>
+        </Link>
       </div>
 
       <div>
