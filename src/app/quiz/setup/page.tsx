@@ -13,6 +13,17 @@ import type { Database } from '@/lib/types/database';
 
 type QuestionRow = Database['public']['Tables']['questions']['Row'];
 
+type SupabaseErrorLike = {
+  message?: string;
+  details?: string;
+  hint?: string;
+  code?: string;
+};
+
+function formatSupabaseError(error: SupabaseErrorLike) {
+  return error.message || error.details || error.hint || error.code || 'Unknown Supabase error';
+}
+
 export default function QuizSetupPage() {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
@@ -85,16 +96,17 @@ export default function QuizSetupPage() {
   // Live matching count (debounced slightly by effect)
   useEffect(() => {
     async function fetchCount() {
-      let query = supabase.from('questions').select('question', { count: 'exact', head: true });
-      if (excludeIncomplete) query = query.eq('is_incomplete', false);
+      let query = supabase.from('questions').select('join_key', { count: 'exact', head: true });
+      if (excludeIncomplete) query = query.or('is_incomplete.is.null,is_incomplete.eq.false');
       if (selectedTopics.length > 0) query = query.in('topic', selectedTopics);
       if (selectedSubtopics.length > 0) query = query.in('subtopic', selectedSubtopics);
       const { count, error } = await query;
       if (error) {
-        setErrorMessage(`Could not count matching questions: ${error.message}`);
+        setErrorMessage(`Could not count matching questions: ${formatSupabaseError(error)}`);
         setMatchingCount(0);
         return;
       }
+      setErrorMessage(null);
       setMatchingCount(count || 0);
     }
     fetchCount();
@@ -133,13 +145,13 @@ export default function QuizSetupPage() {
 
     // 2. Fetch randomized questions
     let query = supabase.from('questions').select('join_key');
-    if (excludeIncomplete) query = query.eq('is_incomplete', false);
+    if (excludeIncomplete) query = query.or('is_incomplete.is.null,is_incomplete.eq.false');
     if (selectedTopics.length > 0) query = query.in('topic', selectedTopics);
     if (selectedSubtopics.length > 0) query = query.in('subtopic', selectedSubtopics);
 
     const { data: qs, error: questionsError } = await query;
     if (questionsError) {
-      setErrorMessage(`Could not load questions: ${questionsError.message}`);
+      setErrorMessage(`Could not load questions: ${formatSupabaseError(questionsError)}`);
       setLoading(false);
       return;
     }
