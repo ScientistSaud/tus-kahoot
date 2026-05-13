@@ -7,7 +7,7 @@ import Link from 'next/link';
 type QuestionRow = Database['public']['Tables']['questions']['Row'];
 type BookmarkQuestion = Pick<
   QuestionRow,
-  'question' | 'topic' | 'question_text' | 'correct_answer' | 'option_a' | 'option_b' | 'option_c' | 'option_d' | 'option_e'
+  'join_key' | 'topic' | 'question_text' | 'correct_answer' | 'option_a' | 'option_b' | 'option_c' | 'option_d' | 'option_e'
 >;
 type BookmarkRow = {
   id: string;
@@ -26,7 +26,7 @@ export default async function BookmarksPage() {
     .select(`
       id,
       questions (
-        question,
+        join_key,
         topic,
         question_text,
         correct_answer,

@@ -51,7 +51,7 @@ export interface Database {
           source_page_hint: string | null
           source_file: string | null
           source_file_id: string | null
-          join_key: string | null
+          join_key: string
         }
         Insert: {
           question: number
@@ -94,7 +94,7 @@ export interface Database {
           source_page_hint?: string | null
           source_file?: string | null
           source_file_id?: string | null
-          join_key?: string | null
+          join_key: string
         }
         Update: Partial<Database['public']['Tables']['questions']['Insert']>
         Relationships: []
@@ -136,7 +136,8 @@ export interface Database {
           id: string
           user_id: string
           session_id: string
-          question_id: number
+          question_id: number | null
+          join_key: string
           user_answer: string | null
           is_correct: boolean
           time_taken_ms: number | null
@@ -146,7 +147,8 @@ export interface Database {
           id?: string
           user_id: string
           session_id: string
-          question_id: number
+          question_id?: number | null
+          join_key: string
           user_answer?: string | null
           is_correct?: boolean
           time_taken_ms?: number | null
@@ -155,11 +157,11 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['attempts']['Insert']>
         Relationships: [
           {
-            foreignKeyName: 'attempts_question_id_fkey'
-            columns: ['question_id']
+            foreignKeyName: 'attempts_join_key_fkey'
+            columns: ['join_key']
             isOneToOne: false
             referencedRelation: 'questions'
-            referencedColumns: ['question']
+            referencedColumns: ['join_key']
           },
           {
             foreignKeyName: 'attempts_session_id_fkey'
@@ -181,23 +183,25 @@ export interface Database {
         Row: {
           id: string
           user_id: string
-          question_id: number
+          question_id: number | null
+          join_key: string
           created_at: string
         }
         Insert: {
           id?: string
           user_id: string
-          question_id: number
+          question_id?: number | null
+          join_key: string
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['bookmarks']['Insert']>
         Relationships: [
           {
-            foreignKeyName: 'bookmarks_question_id_fkey'
-            columns: ['question_id']
+            foreignKeyName: 'bookmarks_join_key_fkey'
+            columns: ['join_key']
             isOneToOne: false
             referencedRelation: 'questions'
-            referencedColumns: ['question']
+            referencedColumns: ['join_key']
           },
           {
             foreignKeyName: 'bookmarks_user_id_fkey'
