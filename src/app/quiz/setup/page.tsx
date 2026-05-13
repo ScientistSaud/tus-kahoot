@@ -17,7 +17,7 @@ export default function QuizSetupPage() {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const setConfig = useQuizStore((state) => state.setConfig);
-  const setQuestionIds = useQuizStore((state) => state.setQuestionIds);
+  const setQuestionJoinKeys = useQuizStore((state) => state.setQuestionJoinKeys);
 
   const [availableTopics, setAvailableTopics] = useState<string[]>([]);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
@@ -132,7 +132,7 @@ export default function QuizSetupPage() {
     const sessionId = sessionData.id;
 
     // 2. Fetch randomized questions
-    let query = supabase.from('questions').select('question');
+    let query = supabase.from('questions').select('join_key');
     if (excludeIncomplete) query = query.eq('is_incomplete', false);
     if (selectedTopics.length > 0) query = query.in('topic', selectedTopics);
     if (selectedSubtopics.length > 0) query = query.in('subtopic', selectedSubtopics);
@@ -148,11 +148,11 @@ export default function QuizSetupPage() {
       // Shuffle & limit
       const shuffled = [...qs].sort(() => 0.5 - Math.random());
       const selectedQs = questionCount === -1 ? shuffled : shuffled.slice(0, questionCount);
-      const qIds = selectedQs.map((q) => q.question);
+      const questionJoinKeys = selectedQs.map((q) => q.join_key);
 
       // 3. Set Store
       setConfig({ sessionId, timerEnabled, sectionFilter: null });
-      setQuestionIds(qIds);
+      setQuestionJoinKeys(questionJoinKeys);
 
       // 4. Navigate
       router.push(`/quiz/${sessionId}`);

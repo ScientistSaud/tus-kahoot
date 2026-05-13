@@ -12,6 +12,7 @@ import { calculateScore } from '@/lib/utils';
 
 interface QuestionData {
   question: number;
+  join_key: string;
   question_text: string;
   option_a: string;
   option_b: string;
@@ -80,7 +81,7 @@ export function QuizPlayer({ questions }: { questions: QuestionData[] }) {
       }
 
       store.addAnswer({
-        questionId: activeQuestion.question,
+        joinKey: activeQuestion.join_key,
         userAnswer: letter,
         isCorrect,
         timeTakenMs: TIMER_DURATION_MS - timeRemainingMs,
@@ -186,7 +187,7 @@ export function QuizPlayer({ questions }: { questions: QuestionData[] }) {
 
       <main className="flex flex-1 flex-col justify-center px-4 py-8">
         <QuestionCard 
-          questionId={activeQuestion.question}
+          joinKey={activeQuestion.join_key}
           questionNumber={currentIndex + 1}
           totalQuestions={questions.length}
           questionText={activeQuestion.question_text}

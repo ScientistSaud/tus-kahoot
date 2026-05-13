@@ -8,7 +8,7 @@ export interface QuizConfig {
 }
 
 export interface AnswerRecord {
-  questionId: number;
+  joinKey: string;
   userAnswer: string | null;
   isCorrect: boolean;
   timeTakenMs: number;
@@ -16,14 +16,14 @@ export interface AnswerRecord {
 
 interface QuizState {
   config: QuizConfig | null;
-  questionIds: number[];
+  questionJoinKeys: string[];
   answers: AnswerRecord[];
   score: number;
   streak: number;
   maxStreak: number;
   
   setConfig: (config: QuizConfig) => void;
-  setQuestionIds: (ids: number[]) => void;
+  setQuestionJoinKeys: (joinKeys: string[]) => void;
   addAnswer: (answer: AnswerRecord, pointsAdded: number) => void;
   resetQuizState: () => void;
 }
@@ -32,14 +32,14 @@ export const useQuizStore = create<QuizState>()(
   persist(
     (set) => ({
       config: null,
-      questionIds: [],
+      questionJoinKeys: [],
       answers: [],
       score: 0,
       streak: 0,
       maxStreak: 0,
 
       setConfig: (config) => set({ config }),
-      setQuestionIds: (questionIds) => set({ questionIds }),
+      setQuestionJoinKeys: (questionJoinKeys) => set({ questionJoinKeys }),
       addAnswer: (answer, pointsAdded) =>
         set((state) => {
           const newStreak = answer.isCorrect ? state.streak + 1 : 0;
@@ -53,7 +53,7 @@ export const useQuizStore = create<QuizState>()(
       resetQuizState: () =>
         set({
           config: null,
-          questionIds: [],
+          questionJoinKeys: [],
           answers: [],
           score: 0,
           streak: 0,

@@ -18,7 +18,7 @@ export default function QuizPage({ params }: { params: Promise<{ sessionId: stri
 
   useEffect(() => {
     // Basic verification: user must have config and sessionId match
-    if (!store.config || store.config.sessionId !== sessionId || store.questionIds.length === 0) {
+    if (!store.config || store.config.sessionId !== sessionId || store.questionJoinKeys.length === 0) {
       router.push('/dashboard');
       return;
     }
@@ -28,7 +28,7 @@ export default function QuizPage({ params }: { params: Promise<{ sessionId: stri
       const { data, error } = await supabase
         .from('questions')
         .select('*')
-        .in('question', store.questionIds);
+        .in('join_key', store.questionJoinKeys);
 
       if (error || !data) {
         console.error(error);
@@ -37,15 +37,15 @@ export default function QuizPage({ params }: { params: Promise<{ sessionId: stri
       }
 
       // Preserve the sorted order from setup
-      const ordered = store.questionIds
-        .map((id) => data.find((q) => q.question === id))
+      const ordered = store.questionJoinKeys
+        .map((joinKey) => data.find((q) => q.join_key === joinKey))
         .filter((question): question is QuestionRow => Boolean(question));
       setQuestions(ordered);
       setLoading(false);
     }
 
     fetchQuestions();
-  }, [sessionId, store.config, store.questionIds, router]);
+  }, [sessionId, store.config, store.questionJoinKeys, router]);
 
   if (loading) {
     return (

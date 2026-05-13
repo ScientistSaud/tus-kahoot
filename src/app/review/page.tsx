@@ -8,7 +8,7 @@ import type { Database } from '@/lib/types/database';
 type QuestionRow = Database['public']['Tables']['questions']['Row'];
 type ReviewQuestion = Pick<
   QuestionRow,
-  'question' | 'topic' | 'question_text' | 'correct_answer' | 'option_a' | 'option_b' | 'option_c' | 'option_d' | 'option_e'
+  'join_key' | 'topic' | 'question_text' | 'correct_answer' | 'option_a' | 'option_b' | 'option_c' | 'option_d' | 'option_e'
 >;
 type ReviewAttempt = {
   id: string;
@@ -32,7 +32,7 @@ export default async function ReviewPage() {
       id,
       user_answer,
       questions (
-        question,
+        join_key,
         topic,
         question_text,
         correct_answer,
@@ -56,7 +56,7 @@ export default async function ReviewPage() {
       const topic = q.topic || 'untagged';
       if (!grouped[topic]) grouped[topic] = [];
       // Prevent duplicates if answered wrong multiple times
-      if (!grouped[topic].find((ext) => ext.questions?.question === q.question)) {
+      if (!grouped[topic].find((ext) => ext.questions?.join_key === q.join_key)) {
         grouped[topic].push(a);
       }
     });
